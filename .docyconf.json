@@ -1,0 +1,6 @@
+{
+  "root_dir": ".",
+  "exclude_dir": ["target", "git", "src"],
+  "exclude_file": ["git", "Cargo"]
+}
+
