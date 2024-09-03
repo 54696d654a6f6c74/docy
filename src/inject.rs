@@ -31,10 +31,15 @@ fn inject_into_file(file: &File) {
 
     let mut cur_cap = 0;
     let mut new_lines = vec![];
+    let mut offset = 0;
 
     for (i, line) in file_lines.enumerate() {
-        if file.captrues.len() > cur_cap && file.captrues[cur_cap].start == (i + 1) {
-            new_lines.push(file.captrues[cur_cap].content.clone());
+        if file.captrues.len() > cur_cap && file.captrues[cur_cap].start - offset == (i + 1) {
+            let injection = file.captrues[cur_cap].content.clone();
+            offset += &injection.split("\n").collect::<Vec<&str>>().len();
+
+            new_lines.push(injection);
+
             cur_cap += 1;
         }
         new_lines.push(line.to_string());
