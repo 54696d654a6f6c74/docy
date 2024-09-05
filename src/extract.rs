@@ -1,9 +1,14 @@
-use crate::storefile::{self, Capture};
+use crate::{
+    options::Options,
+    storefile::{self, Capture},
+};
 use std::{ffi::OsString, fs, str::Split};
 use walkdir::DirEntry;
 
-pub fn run(targets: Vec<DirEntry>, mut store_data: storefile::StoreFile) {
-    if store_data.last_action.is_some() && store_data.last_action.unwrap() == storefile::Action::Ex
+pub fn run(targets: Vec<DirEntry>, mut store_data: storefile::StoreFile, options: Options) {
+    if store_data.last_action.is_some()
+        && store_data.last_action.unwrap() == storefile::Action::Ex
+        && !options.force_action
     {
         println!("Previous action was extraction. Exiting without doing any work...");
         return;
@@ -13,7 +18,10 @@ pub fn run(targets: Vec<DirEntry>, mut store_data: storefile::StoreFile) {
     let mut new_file_contents = vec![];
 
     for target in &targets {
-        println!("{:?}", &target);
+        if options.verbose {
+            println!("Extracing from: {:?}", &target);
+        }
+
         let contents = fs::read_to_string(target.path()).expect("Failed to read file");
 
         let (captrues, lines) = identify_js_doc(&contents);

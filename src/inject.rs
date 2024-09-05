@@ -1,19 +1,28 @@
-use crate::storefile::{self, File};
+use crate::{
+    options,
+    storefile::{self, File},
+};
 use std::fs;
 
-pub fn run(mut store_data: storefile::StoreFile) {
+pub fn run(mut store_data: storefile::StoreFile, options: options::Options) {
     if store_data.files.len() <= 0 {
         println!("No changes in store files. Exiting without doing any work...");
         return;
     }
 
-    if store_data.last_action.is_some() && store_data.last_action.unwrap() == storefile::Action::In
+    if store_data.last_action.is_some()
+        && store_data.last_action.unwrap() == storefile::Action::In
+        && !options.force_action
     {
         println!("Last call was inject. Exiting without doing any work...");
         return;
     }
 
     for file in &store_data.files {
+        if options.verbose {
+            println!("Injecting into: {:?}", file.path)
+        }
+
         inject_into_file(file);
     }
 
